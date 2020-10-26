@@ -34,9 +34,10 @@ class Encoder(nn.Module):
         checkpoint = torch.load(path)
         model.load_state_dict(checkpoint['state_dict'])
         print("=> loaded checkpoint '{}'".format(path))
-        modules = list(model.children())[:-2]
+        modules = list(model.module.children())[:-2]
         obj = cls()
         obj.resnet = nn.Sequential(*modules)
+        print(obj.resnet)
         obj.fine_tune()
         return obj
 

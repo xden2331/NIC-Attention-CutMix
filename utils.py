@@ -3,7 +3,7 @@ import numpy as np
 import h5py
 import json
 import torch
-from scipy.misc import imread, imresize
+from scipy.misc.pilutil import imread, imresize
 from tqdm import tqdm
 from collections import Counter
 from random import seed, choice, sample
@@ -134,6 +134,7 @@ def create_input_files(dataset, karpathy_json_path, image_folder, captions_per_i
 
                     enc_captions.append(enc_c)
                     caplens.append(c_len)
+                os.remove(impaths[i])
 
             # Sanity check
             assert images.shape[0] * captions_per_image == len(enc_captions) == len(caplens)
@@ -144,6 +145,7 @@ def create_input_files(dataset, karpathy_json_path, image_folder, captions_per_i
 
             with open(os.path.join(output_folder, split + '_CAPLENS_' + base_filename + '.json'), 'w') as j:
                 json.dump(caplens, j)
+    
 
 
 def init_embedding(embeddings):
@@ -228,11 +230,10 @@ def save_checkpoint(data_name, epoch, epochs_since_improvement, encoder, decoder
              'encoder_optimizer': encoder_optimizer,
              'decoder_optimizer': decoder_optimizer}
     filename = 'checkpoint_' + data_name + '.pth.tar'
-    path = 'drive/My Drive/NLP/NIC-CutMix/'
-    torch.save(state, path + filename)
+    torch.save(state, './drive/My Drive/NLP/Attentive CutMix/NIC with Attentive CutMix/'+ filename)
     # If this checkpoint is the best so far, store a copy so it doesn't get overwritten by a worse checkpoint
     if is_best:
-        torch.save(state, path + 'BEST_' + filename)
+        torch.save(state, 'BEST_' + filename)
 
 
 class AverageMeter(object):

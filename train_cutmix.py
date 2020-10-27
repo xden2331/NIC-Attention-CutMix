@@ -35,7 +35,7 @@ alpha_c = 1.  # regularization parameter for 'doubly stochastic attention', as i
 best_bleu4 = 0.  # BLEU-4 score right now
 print_freq = 100  # print training/validation stats every __ batches
 fine_tune_encoder = False  # fine-tune encoder?
-checkpoint = None  # path to checkpoint, None if none
+checkpoint = 'drive/My Drive/NLP/NIC-CutMix/checkpoint_coco_5_cap_per_img_5_min_word_freq.pth.tar'  # path to checkpoint, None if none
 encoder_path = 'drive/My Drive/NLP/CutMix/resnet-101/ImageNet/'
 
 
@@ -66,6 +66,7 @@ def main():
                                              lr=encoder_lr) if fine_tune_encoder else None
 
     else:
+        print('Loading from pretrained')
         checkpoint = torch.load(checkpoint)
         start_epoch = checkpoint['epoch'] + 1
         epochs_since_improvement = checkpoint['epochs_since_improvement']
@@ -292,8 +293,6 @@ def validate(val_loader, encoder, decoder, criterion):
                       'Top-5 Accuracy {top5.val:.3f} ({top5.avg:.3f})\t').format(i, len(val_loader), batch_time=batch_time,
                                                                                 loss=losses, top5=top5accs)
                 print(log)
-                with open('drive/My Drive/NLP/NIC-CutMix/val_scores.tsv', 'a') as f:
-                    f.write(log)
 
             # Store references (true captions), and hypothesis (prediction) for each image
             # If for n images, we have n hypotheses, and references a, b, c... for each image, we need -
@@ -322,11 +321,13 @@ def validate(val_loader, encoder, decoder, criterion):
         # Calculate BLEU-4 scores
         bleu4 = corpus_bleu(references, hypotheses)
 
-        print(
-            '\n * LOSS - {loss.avg:.3f}, TOP-5 ACCURACY - {top5.avg:.3f}, BLEU-4 - {bleu}\n'.format(
+        log = '\n * LOSS - {loss.avg:.3f}, TOP-5 ACCURACY - {top5.avg:.3f}, BLEU-4 - {bleu}\n'.format(
                 loss=losses,
                 top5=top5accs,
-                bleu=bleu4))
+                bleu=bleu4)
+        print(log)
+        with open('drive/My Drive/NLP/NIC-CutMix/val_scores.txt', 'a') as f:
+            f.write(log)
 
     return bleu4
 
